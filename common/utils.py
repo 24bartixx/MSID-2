@@ -1,3 +1,6 @@
+from sklearn.compose import ColumnTransformer
+from sklearn.discriminant_analysis import StandardScaler
+from sklearn.preprocessing import OneHotEncoder
 from common.consts import DATA_PATH, CATEGORICAL_COLUMN_NAMES, CATEGORY_TRANSLATIONS
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -22,4 +25,5 @@ def split(X, y):
     X_val, X_test, y_val, y_test = train_test_split(X_rest, y_rest, test_size=0.6, random_state=30)
     
     return X_train, X_val, X_test, y_train, y_val, y_test
+
     

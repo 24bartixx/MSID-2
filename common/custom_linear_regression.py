@@ -57,6 +57,7 @@ class LinearRegressionGradientDescent(CustomLinearRegression):
         batch_size = kwargs.get("batch_size", None)
         learning_rate = kwargs.get("learning_rate", 0.01)
         should_scale = kwargs.get("should_scale", False)
+        mini_batch = kwargs.get("mini_batch", True)
         
         X_matrix, y_matrix = self._fit_base(X, y)
         
@@ -64,22 +65,34 @@ class LinearRegressionGradientDescent(CustomLinearRegression):
             X_matrix = StandardScaler().fit(X_matrix)
             
         samples_count, feat_count = X_matrix.shape
-        
         self.coefficients_ = np.zeros((feat_count, 1))
         
         for _ in range(epochs):
-            if batch_size:
-                indices = np.random.choice(samples_count, batch_size, replace = False)
-                X_batch = X_matrix[indices]
-                y_batch = y_matrix[indices]
-            else:               # simple batch gradient descent
-                X_batch = X_matrix
-                y_batch = y_matrix
-                
-            factor = (2 / (batch_size if batch_size else samples_count)) 
-            gradients = factor * X_batch.T @ (X_batch @ self.coefficients_ - y_batch)
+            
+            if mini_batch and batch_size:           # mini batch gradient descent
+                indices = np.random.permutation(samples_count)
+                for i in range(0, samples_count, batch_size):
+                    batch_indices = indices[i:i+batch_size]
+                    X_batch = X_matrix[batch_indices]
+                    y_batch = y_matrix[batch_indices]
                     
-            self.coefficients_ -= learning_rate * gradients
+                    gradients = (2 / len(X_batch)) * X_batch.T @ (X_batch @ self.coefficients_ - y_batch)
+                    self.coefficients_ -= learning_rate * gradients
+                        
+            else:
+                
+                if batch_size:                      # stochastic batch gradient descent
+                    indices = np.random.choice(samples_count, batch_size, replace = False)
+                    X_batch = X_matrix[indices]
+                    y_batch = y_matrix[indices]
+                    factor = 2 / batch_size
+                else:                               # simple batch gradient descent
+                    X_batch = X_matrix
+                    y_batch = y_matrix
+                    factor = 2 / samples_count
+                    
+                gradients = factor * X_batch.T @ (X_batch @ self.coefficients_ - y_batch)
+                self.coefficients_ -= learning_rate * gradients
         
         return self
             
