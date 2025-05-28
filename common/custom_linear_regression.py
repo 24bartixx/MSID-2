@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.metrics import mean_squared_error
 
 class CustomLinearRegression(BaseEstimator, RegressorMixin):
     def __init__(self):
@@ -74,6 +75,40 @@ class LinearRegressionGradientDescent(CustomLinearRegression):
         return self
             
         
+        
+        
+PARAM_CANDIDATES = {
+    "epochs": [2500, 5000, 7500, 10000],
+    "batch_sizes": [None, 64, 128, 256],
+    "learning_rates": [0.0005, 0.001, 0.005]
+}
+
+
+def find_gradient_descent_best_params(X_train, y_train, X_val, y_val, should_log=False):
+    
+    model = LinearRegressionGradientDescent()
+    best_mse = float('inf')
+    best_params = None
+    
+    for epochs in PARAM_CANDIDATES["epochs"]:
+        for batch_size in PARAM_CANDIDATES["batch_sizes"]:
+            for learning_rate in PARAM_CANDIDATES["learning_rates"]:
+                kwargs = {
+                    "epochs": epochs, 
+                    "batch_size": batch_size, 
+                    "learning_rate": learning_rate
+                }
+                model.fit(X_train, y_train, **kwargs)
+                mse = mean_squared_error(y_val, model.predict(X_val))
+                if mse < best_mse:
+                    best_mse = mse
+                    best_params = kwargs.copy()
+                
+        # log (but it's not log XD)    
+        if should_log:
+            print("\tepochs = ", epochs)
+                    
+    return best_params
     
     
     

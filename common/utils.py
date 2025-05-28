@@ -3,21 +3,18 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-def get_data():  
+def get_data(only_numeric=False):  
     data = pd.read_csv(DATA_PATH, sep=";")
     data.columns = data.columns.str.strip()
     
-    for column_name in CATEGORICAL_COLUMN_NAMES:
-        data[column_name] = data[column_name].map(lambda field: CATEGORY_TRANSLATIONS.get(column_name, {}).get(field, field))
+    if only_numeric:
+        data = data.drop(columns=CATEGORICAL_COLUMN_NAMES)
+    else:
+        for column_name in CATEGORICAL_COLUMN_NAMES:
+            data[column_name] = data[column_name].map(lambda field: CATEGORY_TRANSLATIONS.get(column_name, {}).get(field, field))
+        
         
     return data
-
-def get_numeric_data():
-    data = pd.read_csv(DATA_PATH, sep=";")
-    data.columns = data.columns.str.strip()
-    data_numeric = data.drop(columns=CATEGORICAL_COLUMN_NAMES)
-    
-    return data_numeric
     
 def split(X, y):
         
