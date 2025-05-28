@@ -100,8 +100,8 @@ class LinearRegressionGradientDescent(CustomLinearRegression):
         
         
 PARAM_CANDIDATES = {
-    "epochs": [2500, 5000, 7500, 10000],
-    "batch_sizes": [None, 64, 128, 256],
+    "epochs": [800, 1000, 1200],
+    "batch_sizes": [None, 256, 360, 512, 1024],
     "learning_rates": [0.0005, 0.001, 0.005]
 }
 
