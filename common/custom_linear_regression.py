@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.discriminant_analysis import StandardScaler
 from sklearn.metrics import mean_squared_error
 
 class CustomLinearRegression(BaseEstimator, RegressorMixin):
@@ -37,8 +38,12 @@ class LinearRegressionClosedForm(CustomLinearRegression):
     def __init__(self):
         super().__init__()
     
-    def fit(self, X, y):
+    def fit(self, X, y, should_scale=False):
         X_matrix, y_matrix = self._fit_base(X, y)
+        
+        if should_scale:
+            X_matrix = StandardScaler().fit(X_matrix)
+        
         self.coefficients_ = np.linalg.inv(X_matrix.T @ X_matrix) @ X_matrix.T @ y_matrix
         return self
         
@@ -51,19 +56,23 @@ class LinearRegressionGradientDescent(CustomLinearRegression):
         epochs = kwargs.get("epochs", 500)
         batch_size = kwargs.get("batch_size", None)
         learning_rate = kwargs.get("learning_rate", 0.01)
+        should_scale = kwargs.get("should_scale", False)
         
         X_matrix, y_matrix = self._fit_base(X, y)
         
+        if should_scale:
+            X_matrix = StandardScaler().fit(X_matrix)
+            
         samples_count, feat_count = X_matrix.shape
         
         self.coefficients_ = np.zeros((feat_count, 1))
         
-        for i in range(epochs):
+        for _ in range(epochs):
             if batch_size:
                 indices = np.random.choice(samples_count, batch_size, replace = False)
                 X_batch = X_matrix[indices]
                 y_batch = y_matrix[indices]
-            else:           # simple batch gradient descent
+            else:               # simple batch gradient descent
                 X_batch = X_matrix
                 y_batch = y_matrix
                 
