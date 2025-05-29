@@ -115,9 +115,3 @@ class CustomLogisticRegressionMulticlass(BaseEstimator, RegressorMixin):
     def transform(self, X):
         return self.predict(X)
         
-            
-            
-            
-            
-            
-            
