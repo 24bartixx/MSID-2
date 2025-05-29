@@ -59,11 +59,6 @@ class LinearRegressionGradientDescent(CustomLinearRegression):
         self.mini_batch = mini_batch
         
     def fit(self, X, y):
-        # epochs = kwargs.get("epochs", 500)
-        # batch_size = kwargs.get("batch_size", None)
-        # learning_rate = kwargs.get("learning_rate", 0.01)
-        # should_scale = kwargs.get("should_scale", False)
-        # mini_batch = kwargs.get("mini_batch", True)
         
         X_matrix, y_matrix = self._fit_base(X, y)
         

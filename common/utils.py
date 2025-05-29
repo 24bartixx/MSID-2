@@ -29,7 +29,7 @@ def split(X, y):
     
     return X_train, X_val, X_test, y_train, y_val, y_test
 
-def get_accurancy_dataframe(model, preprocessor, X_train_val, y_train_val, X_test, y_test, cv=5):    
+def get_custom_dataframe(model, preprocessor, loss_method, X_train_val, y_train_val, X_test, y_test, cv=5, random_states=None):    
     pipeline = Pipeline([
         ("preprocessing", preprocessor),
         ("classifier", model)
@@ -37,8 +37,9 @@ def get_accurancy_dataframe(model, preprocessor, X_train_val, y_train_val, X_tes
     
     results = np.empty((0, 3))
     
-    for _ in range(cv):
-        X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=0.2)
+    for i in range(cv):
+        random_state = random_states[i] if random_states else None
+        X_train, X_val, y_train, y_val = train_test_split(X_train_val, y_train_val, test_size=0.2, random_state=random_state)
         
         pipeline.fit(X_train, y_train)
         
@@ -47,12 +48,11 @@ def get_accurancy_dataframe(model, preprocessor, X_train_val, y_train_val, X_tes
         y_pred_test = pipeline.predict(X_test)
         
         results = np.vstack([results, np.array([
-            accuracy_score(y_train, y_pred_train), 
-            accuracy_score(y_val, y_pred_val),
-            accuracy_score(y_test, y_pred_test)
+            loss_method(y_train, y_pred_train), 
+            loss_method(y_val, y_pred_val),
+            loss_method(y_test, y_pred_test)
         ])])
         
     result_df = pd.DataFrame(results.T, index=["Train", "Validation", "Test"])
     return result_df
-
     
